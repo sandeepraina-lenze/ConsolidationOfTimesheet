@@ -4,11 +4,16 @@
 
 package com.odc.readexcel;
 
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -18,9 +23,21 @@ public class ReadExcelFile
         ArrayList<String> columndata = null;
         final ArrayList<String> returnColumnData = new ArrayList<String>();
         try {
-            final File f = new File(filePath);
-            final FileInputStream ios = new FileInputStream(f);
-            final Workbook workbook = WorkbookFactory.create((InputStream)ios);
+//            final File f = new File(filePath);
+//            final FileInputStream ios = new FileInputStream(f);
+            Workbook workbook = null;
+
+            if (filePath.toString().endsWith(".xls")) {
+                POIFSFileSystem fs = new POIFSFileSystem(new File(filePath));
+                workbook = new HSSFWorkbook(fs.getRoot(), true);
+                fs.close();
+            } else {
+                // XSSFWorkbook, File
+                OPCPackage pkg = OPCPackage.open(new File(filePath));
+                workbook = new XSSFWorkbook(pkg);
+                pkg.close();
+            }
+
             for (int i = 0; i < workbook.getNumberOfSheets(); ++i) {
                 final Sheet sheet = workbook.getSheetAt(i);
                 final Iterator<Row> rowIterator = sheet.iterator();
@@ -47,7 +64,7 @@ public class ReadExcelFile
                         }
                     }
                 }
-                ios.close();
+//                ios.close();
                 returnColumnData.addAll(columndata);
             }
         }

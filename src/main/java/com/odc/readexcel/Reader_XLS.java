@@ -4,15 +4,15 @@
 
 package com.odc.readexcel;
 
-import java.util.Iterator;
-
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import java.io.OutputStream;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import java.io.InputStream;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
+
+import java.io.*;
+import java.util.Iterator;
 
 public class Reader_XLS
 {
@@ -35,10 +35,16 @@ public class Reader_XLS
         this.FOS = null;
         this.path = path;
         try {
-            this.FIS = new FileInputStream(path);
-            this.workbook = WorkbookFactory.create((InputStream)this.FIS);
-            this.sheet = this.workbook.getSheetAt(0);
-            this.FIS.close();
+            if (path.toString().endsWith(".xls")) {
+                POIFSFileSystem fs = new POIFSFileSystem(new File(path));
+                this.workbook = new HSSFWorkbook(fs.getRoot(), true);
+                fs.close();
+            } else {
+                // XSSFWorkbook, File
+                OPCPackage pkg = OPCPackage.open(new File(path));
+                this.workbook = new XSSFWorkbook(pkg);
+                pkg.close();
+            }
         }
         catch (final Exception e) {
             e.printStackTrace();
