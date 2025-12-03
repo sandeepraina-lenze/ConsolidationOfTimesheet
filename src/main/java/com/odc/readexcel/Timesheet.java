@@ -4,6 +4,7 @@
 
 package com.odc.readexcel;
 
+import com.timesheet.panels.DatePanel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -126,7 +127,7 @@ public class Timesheet
             final List<Double> Data = new ArrayList<Double>();
             final String key = iter.next();
             Data.add(SOW_Time_Mapping.get(key));
-            double percent = SOW_Time_Mapping.get(key) / TotalHoursPerResource * 100.0;
+            double percent = SOW_Time_Mapping.get(key) / DatePanel.getTotalWorkingHours() * 100.0;
             percent = Math.round(percent * 100.0) / 100.0;
             Data.add(percent);
             SOW_TimePercent_Mapping.put(key, Data);
@@ -300,10 +301,16 @@ public class Timesheet
         this.formatting(workbook, Sheetname, 3, 1, 10, "Arial", 1, "GRAY");
         final Set<String> ResourceNames = ht.keySet();
         final Set SOW_Names = new TreeSet();
-        Iterator<String> EachName = ResourceNames.iterator();
-        while (EachName.hasNext()) {
-            SOW_Names.addAll(ht.get(EachName.next()).keySet());
+
+        List<String> EachNames = new ArrayList<>(ResourceNames); // Copy to a List
+        Collections.sort(EachNames); // Sort the list
+
+
+        // Now iterate over sorted list
+        for (String EachName : EachNames) {
+            SOW_Names.addAll(ht.get(EachName).keySet());
         }
+
         SOW_Names.remove(TotalHour);
         final Iterator<String> EachSOWName = SOW_Names.iterator();
         while (EachSOWName.hasNext()) {
@@ -313,12 +320,13 @@ public class Timesheet
         }
         this.setCellValue(workbook, Sheetname, 1, SOW_StartRowNum, TotalHour);
         this.formatting(workbook, Sheetname, SOW_StartRowNum, 1, 10, "Arial", 1, "YELLOW");
-        EachName = ResourceNames.iterator();
-        while (EachName.hasNext()) {
+
+        for (String EachName : EachNames) {
             Double TotalHoursPerResource = 0.0;
-            final String ResourceName = EachName.next();
+            final String ResourceName = EachName;
             final String ResourceChangedName = TimeSheetValidation.ResourceNamesMap.get(ResourceName);
             this.setCellValue(workbook, Sheetname, ResourceName_StartColumnNum, 2, ResourceChangedName);
+            this.setCellValue(workbook, Sheetname, ResourceName_StartColumnNum + 1, 2, ResourceChangedName);
             this.formatting(workbook, Sheetname, 2, ResourceName_StartColumnNum, 10, "Arial", 1, "BLANK");
             this.formatting(workbook, Sheetname, 2, ResourceName_StartColumnNum + 1, 10, "Arial", 1, "BLANK");
             this.setCellValue(workbook, Sheetname, ResourceName_StartColumnNum, 3, ActualHour);
@@ -352,8 +360,8 @@ public class Timesheet
             for (SOW_StartRowNum = 4; !this.getCellData(workbook, Sheetname, SOW_StartRowNum, 1).equals(TotalHour); ++SOW_StartRowNum) {
                 Double Percent = 0.0;
                 final Double Resourcehours = (Double)this.getIntegerCellData(workbook, Sheetname, SOW_StartRowNum, ResourceName_StartColumnNum);
-                if (TotalHoursPerResource != 0.0) {
-                    Percent = Resourcehours / TotalHoursPerResource * 100.0;
+                if (DatePanel.getTotalWorkingHours() != 0.0) {
+                    Percent = Resourcehours / DatePanel.getTotalWorkingHours() * 100.0;
                 }
                 Percent = Math.round(Percent * 100.0) / 100.0;
                 TotalPercent += Percent;

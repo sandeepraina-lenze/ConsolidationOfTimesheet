@@ -24,8 +24,8 @@ import javax.swing.JPanel;
 public class PanelOne extends JPanel implements ActionListener
 {
     private static final long serialVersionUID = 1L;
-    private static final String SOW_LOAD = " Load SOW Template:                 ";
-    private static final String OUTPUT_TEMPLATE = "Load Output Template:              ";
+    private static final String SOW_LOAD = " Load Running MPPs list in  excel:                 ";
+    private static final String OUTPUT_TEMPLATE = "Load Sample Output Template:              ";
     private PathSelectionPanel sowPathSelection;
     private PathSelectionPanel outputTemplatePathSelection;
     private JButton sowBrowseButton;
@@ -47,9 +47,9 @@ public class PanelOne extends JPanel implements ActionListener
     }
     
     protected void createLayout() {
-        this.add(this.sowPathSelection = new PathSelectionPanel(" Load SOW Template:                 "));
+        this.add(this.sowPathSelection = new PathSelectionPanel(SOW_LOAD));
         (this.sowBrowseButton = this.sowPathSelection.getBrowseButton()).addActionListener(this);
-        this.outputTemplatePathSelection = new PathSelectionPanel("Load Output Template:              ");
+        this.outputTemplatePathSelection = new PathSelectionPanel(OUTPUT_TEMPLATE);
         (this.outputBrowseButton = this.outputTemplatePathSelection.getBrowseButton()).addActionListener(this);
         this.add(this.outputTemplatePathSelection);
     }

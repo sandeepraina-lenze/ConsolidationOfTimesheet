@@ -59,11 +59,11 @@ public class PanelTwo extends JPanel implements ActionListener
             final JFileChooser fileChooser = new JFileChooser();
             fileChooser.setName("Browse");
             fileChooser.setCurrentDirectory(new File(this.timesheetPathSelection.getPath()));
-            fileChooser.setMultiSelectionEnabled(false);
-            fileChooser.setFileSelectionMode(1);
+            fileChooser.setMultiSelectionEnabled(true);
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             fileChooser.addChoosableFileFilter(fileChooser.getAcceptAllFileFilter());
-            if (fileChooser.showSaveDialog(this) == 0) {
-                final String path = fileChooser.getSelectedFile().getAbsolutePath();
+            if (fileChooser.showOpenDialog(this) == 0) {
+                final String path = fileChooser.getSelectedFile().getParent();
                 this.timesheetPathSelection.setPath(path);
             }
             if (this.tableCreated) {
@@ -75,7 +75,7 @@ public class PanelTwo extends JPanel implements ActionListener
             final int height = PanelTwoTable.getTable().getRowCount() * PanelTwoTable.getTable().getRowHeight();
             PanelTwoTable.getTable().setPreferredScrollableViewportSize(new Dimension(830, 100));
             this.add(PanelTwo.panelTwoTable);
-            this.add(PanelTwo.loadButton = new JButton("Load Timesheets"));
+            this.add(PanelTwo.loadButton = new JButton(LOAD));
             PanelTwo.loadButton.addActionListener(this);
             if (!this.tableCreated) {
                 this.tableCreated = true;

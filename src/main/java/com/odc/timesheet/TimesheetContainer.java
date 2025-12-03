@@ -7,32 +7,31 @@ package com.odc.timesheet;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import com.odc.readexcel.Timesheet;
-import java.awt.GridBagConstraints;
+
+import java.awt.*;
+
 import com.timesheet.panels.PanelThree;
 import javax.swing.JSeparator;
 import javax.swing.JOptionPane;
 import com.timesheet.panels.DatePicker;
 import java.awt.event.ActionEvent;
 import com.timesheet.panels.DatePanel;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.Color;
+
 import javax.swing.JLabel;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
-import java.awt.LayoutManager;
-import java.awt.GridBagLayout;
-import java.awt.Dimension;
+
 import com.timesheet.panels.PanelTwo;
 import javax.swing.JPanel;
 import com.timesheet.panels.PanelOne;
+import org.apache.poi.ss.formula.functions.T;
+
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import java.util.Date;
-import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.util.TreeSet;
 import javax.swing.JFrame;
 
 public class TimesheetContainer extends JFrame implements ActionListener
@@ -91,11 +90,14 @@ public class TimesheetContainer extends JFrame implements ActionListener
     public JTextField getStartDateTextField() {
         return this.startDateTextField;
     }
-    
+
+
     private void prepareGUI() {
-        (TimesheetContainer.mainFrame = new JFrame("Consolidation of timesheet")).setLocation(200, 100);
-        TimesheetContainer.mainFrame.setResizable(false);
-        TimesheetContainer.mainFrame.setPreferredSize(new Dimension(850, 600));
+        TimesheetContainer.mainFrame = new JFrame("Consolidation of timesheet");
+        TimesheetContainer.mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        TimesheetContainer.mainFrame.setResizable(true);
+//        TimesheetContainer.mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
         TimesheetContainer.mainFrame.setLayout(new GridBagLayout());
         TimesheetContainer.mainFrame.addWindowListener(new WindowAdapter() {
             @Override
@@ -103,9 +105,15 @@ public class TimesheetContainer extends JFrame implements ActionListener
                 System.exit(0);
             }
         });
+
+
         TimesheetContainer.mainFrame.setVisible(true);
+
+
+
     }
-    
+
+
     private void createPanel() {
         final JLabel jlabel = new JLabel("Consolidation of timesheet");
         jlabel.setForeground(Color.RED);
@@ -166,11 +174,12 @@ public class TimesheetContainer extends JFrame implements ActionListener
         TimesheetContainer.panelThree = new PanelThree().createThirdPanel();
         addComponent(TimesheetContainer.mainFrame, TimesheetContainer.panelThree, 0, 4, 1, 1, 1.0, 0.2, 11, 1);
         addComponent(TimesheetContainer.mainFrame, new JSeparator(0), 0, 5, 1, 1, 1.0, 0.01, 11, 1);
-        TimesheetContainer.generateOutputTemplate = new JButton("Generate SOW/Resource efforts");
+        TimesheetContainer.generateOutputTemplate = new JButton(OUTPUT_TEMPLATE);
         addComponent(TimesheetContainer.mainFrame, TimesheetContainer.generateOutputTemplate, 0, 6, 1, 1, 0.1, 0.005, 14, 14);
         TimesheetContainer.generateOutputTemplate.addActionListener(this);
         TimesheetContainer.generateOutputTemplate.setEnabled(false);
-        TimesheetContainer.mainFrame.pack();
+        TimesheetContainer.mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//        TimesheetContainer.mainFrame.pack();
     }
     
     private static void addComponent(final Container container, final Component component, final int gridx, final int gridy, final int gridwidth, final int gridheight, final double weightx, final double weighty, final int anchor, final int fill) {
@@ -183,6 +192,7 @@ public class TimesheetContainer extends JFrame implements ActionListener
         if (ae.getSource() == TimesheetContainer.generateOutputTemplate) {
             try {
                 final Timesheet OutputSheet = new Timesheet(PanelOne.getOutputpath());
+
                 OutputSheet.TemplateSet(PanelOne.getOutputFileMap());
             }
             catch (final Exception e) {
